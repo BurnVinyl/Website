@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BurnVinyl — Burn Your Music. Press It Forever.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #f0ece4;
+    --off-white: #c8c0b0;
+    --dim: #3a3530;
+    --groove: #161412;
+    --accent: #e8e0d0;
+    --ember: #c0392b;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor.expand { width: 40px; height: 40px; }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2rem 4rem;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.96) 0%, transparent 100%);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 0.3em;
+    color: var(--white); text-decoration: none;
+  }
+  .logo span { color: var(--ember); }
+  nav ul { list-style: none; display: flex; gap: 3rem; }
+  nav ul a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--off-white); text-decoration: none; transition: color 0.3s;
+  }
+  nav ul a:hover { color: var(--white); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    position: relative; overflow: hidden; padding: 10rem 4rem 6rem;
+  }
+  .vinyl-bg {
+    position: absolute; right: -12vw; top: 50%;
+    transform: translateY(-50%);
+    width: 72vw; height: 72vw; max-width: 920px; max-height: 920px;
+    animation: spin 40s linear infinite; opacity: 0.065;
+  }
+  @keyframes spin {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to   { transform: translateY(-50%) rotate(360deg); }
+  }
+  .vinyl-bg-2 {
+    position: absolute; left: -22vw; bottom: -12vw;
+    width: 52vw; height: 52vw;
+    animation: spin2 65s linear infinite reverse; opacity: 0.035;
+  }
+  @keyframes spin2 {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .hero-glow {
+    position: absolute; right: 20vw; top: 40%;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,57,43,0.08) 0%, transparent 70%);
+    pointer-events: none; animation: breathe 4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%,100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 820px; margin-left: 4vw; }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--ember); opacity: 0.9; margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-tag::before {
+    content: ''; display: inline-block; width: 36px; height: 1px; background: var(--ember);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4.5rem, 10vw, 11.5rem);
+    line-height: 0.88; letter-spacing: 0.02em; color: var(--white); margin-bottom: 1.8rem;
+  }
+  h1 em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 300; font-size: 0.6em;
+    color: var(--off-white); display: block; letter-spacing: 0.06em;
+  }
+  .hero-sub {
+    font-size: 1.4rem; font-weight: 300; line-height: 1.75;
+    color: var(--off-white); max-width: 540px; margin-bottom: 3.5rem;
+  }
+  .hero-cta { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 1.15rem 2.8rem; background: var(--white); color: var(--black);
+    border: none; cursor: none; text-decoration: none;
+    transition: background 0.3s, transform 0.2s; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-ghost {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 1.15rem 2.4rem; border: 1px solid rgba(240,236,228,0.2);
+    color: var(--off-white); cursor: none; text-decoration: none;
+    transition: border-color 0.3s, color 0.3s; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--white); color: var(--white); }
+
+  /* MARQUEE */
+  .marquee-strip {
+    background: var(--white); color: var(--black);
+    padding: 1rem 0; overflow: hidden; white-space: nowrap;
+  }
+  .marquee-track { display: inline-flex; animation: marquee 30s linear infinite; }
+  .marquee-track span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.05rem; letter-spacing: 0.3em; padding: 0 2.5rem;
+  }
+  .marquee-track .dot { opacity: 0.25; padding: 0 0.5rem; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* SECTIONS */
+  section { padding: 8rem 4rem; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--off-white); opacity: 0.45; margin-bottom: 1rem;
+  }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 6rem); line-height: 1;
+    letter-spacing: 0.03em; color: var(--white); margin-bottom: 1.5rem;
+  }
+
+  /* WHAT IS IT */
+  .what-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+  }
+  .what-text p {
+    font-size: 1.25rem; font-weight: 300; line-height: 1.85;
+    color: var(--off-white); margin-bottom: 1.5rem;
+  }
+  .what-text p strong { color: var(--white); font-weight: 400; }
+
+  /* Record visual */
+  .record-visual { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+  .record-diagram { position: relative; width: 340px; height: 340px; }
+  .record-disc {
+    width: 340px; height: 340px; border-radius: 50%;
+    background: radial-gradient(circle at center,
+      #1a1614 0%, #0d0b0a 8%, #1e1a17 9%, #0a0908 15%,
+      #1a1614 16%, #0a0908 22%, #1a1614 23%, #0a0908 30%,
+      #1e1a18 31%, #0a0908 38%, #1a1614 39%, #0a0908 46%,
+      #1e1a18 47%, #0a0908 50%, #0c0a09 100%);
+    box-shadow: 0 0 0 2px #2a2520, 0 20px 80px rgba(0,0,0,0.7);
+    animation: slowspin 25s linear infinite;
+    position: absolute; top: 0; left: 0;
+  }
+  @keyframes slowspin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .burn-dot {
+    position: absolute;
+    width: 5px; height: 5px;
+    background: var(--ember); border-radius: 50%;
+    box-shadow: 0 0 10px 4px rgba(192,57,43,0.75);
+    animation: burnorbit 3s linear infinite;
+    top: 50%; left: 50%; margin: -2.5px 0 0 -2.5px;
+  }
+  @keyframes burnorbit {
+    from { transform: rotate(0deg) translateX(130px); }
+    to   { transform: rotate(360deg) translateX(130px); }
+  }
+  .record-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px; height: 90px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #201c1a, #0e0c0b);
+    border: 1px solid #2a2520;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 4;
+  }
+  .record-center-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.55rem; letter-spacing: 0.3em; color: var(--off-white); opacity: 0.6;
+  }
+  .capacity-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    width: 100%; max-width: 340px; background: var(--dim); border: 1px solid var(--dim);
+  }
+  .cap-cell { background: var(--black); padding: 1.2rem 1.5rem; text-align: center; }
+  .cap-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem; color: var(--white); line-height: 1; margin-bottom: 0.2rem;
+  }
+  .cap-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--off-white); opacity: 0.5;
+  }
+
+  /* HOW IT WORKS */
+  .how { background: var(--groove); }
+  .how-inner { max-width: 1400px; margin: 0 auto; }
+  .how-header { margin-bottom: 5rem; }
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative;
+  }
+  .steps::before {
+    content: ''; position: absolute; top: 0.35rem; left: 12%; right: 12%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--dim) 20%, var(--dim) 80%, transparent);
+  }
+  .step { padding: 0 2.5rem 0 0; }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4.5rem; color: rgba(240,236,228,0.05); line-height: 1;
+    position: absolute; margin-top: -1rem;
+  }
+  .step-dot {
+    width: 8px; height: 8px; background: var(--ember); border-radius: 50%;
+    margin-bottom: 2.5rem; box-shadow: 0 0 16px 4px rgba(192,57,43,0.5);
+    position: relative; z-index: 2;
+  }
+  .step h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.75rem; letter-spacing: 0.05em; color: var(--white); margin-bottom: 0.8rem;
+  }
+  .step p {
+    font-size: 1.05rem; font-weight: 300; line-height: 1.75; color: var(--off-white); opacity: 0.75;
+  }
+
+  /* PERMANENCE */
+  .permanence {
+    background: var(--white); color: var(--black); text-align: center; position: relative; overflow: hidden;
+  }
+  .permanence::before, .permanence::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    border-radius: 50%; border: 1px solid rgba(8,8,8,0.05); transform: translate(-50%, -50%);
+  }
+  .permanence::before { width: 700px; height: 700px; }
+  .permanence::after  { width: 1100px; height: 1100px; }
+  .permanence .section-label { color: rgba(8,8,8,0.4); }
+  .permanence-quote {
+    font-size: clamp(1.5rem, 2.8vw, 2.3rem); font-weight: 300; font-style: italic;
+    line-height: 1.55; color: var(--black); max-width: 860px; margin: 0 auto 2.5rem;
+  }
+  .permanence-quote strong { font-style: normal; font-weight: 600; }
+  .permanence-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(8,8,8,0.35);
+  }
+
+  /* TRACKLIST DEMO */
+  .burn-demo { background: var(--groove); }
+  .burn-demo-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+  }
+  .burn-demo p {
+    font-size: 1.2rem; font-weight: 300; line-height: 1.85; color: var(--off-white); margin-bottom: 1.5rem;
+  }
+  .burn-demo p strong { color: var(--white); font-weight: 400; }
+  .tracklist { border: 1px solid var(--dim); }
+  .tracklist-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--dim);
+    background: rgba(240,236,228,0.02);
+  }
+  .tracklist-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.15em; color: var(--white);
+  }
+  .tracklist-cap {
+    font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.15em; color: var(--ember);
+  }
+  .side-divider {
+    display: flex; align-items: center; gap: 1rem; padding: 0.7rem 1.5rem;
+    background: rgba(240,236,228,0.025); border-bottom: 1px solid var(--dim);
+  }
+  .side-divider-label {
+    font-family: 'Space Mono', monospace; font-size: 0.55rem;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--off-white); opacity: 0.35;
+  }
+  .side-remaining {
+    font-family: 'Space Mono', monospace; font-size: 0.55rem;
+    letter-spacing: 0.1em; color: var(--off-white); opacity: 0.3; margin-left: auto;
+  }
+  .track-row {
+    display: grid; grid-template-columns: 2rem 1fr auto; align-items: center;
+    gap: 1rem; padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid rgba(58,53,48,0.4); transition: background 0.2s;
+  }
+  .track-row:last-child { border-bottom: none; }
+  .track-row:hover { background: rgba(240,236,228,0.03); }
+  .track-idx { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--off-white); opacity: 0.35; }
+  .track-name { font-size: 1rem; font-weight: 300; color: var(--off-white); }
+  .track-dur  { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--off-white); opacity: 0.4; }
+  .track-row.burned .track-name { color: var(--white); }
+  .track-row.burning .track-name { color: var(--ember); }
+  .track-row.burning .track-idx { color: var(--ember); opacity: 1; animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* FEATURES */
+  .features-inner { max-width: 1400px; margin: 0 auto; }
+  .features-header { margin-bottom: 5rem; }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--dim); border: 1px solid var(--dim);
+  }
+  .feature-card {
+    background: var(--black); padding: 3rem; position: relative; overflow: hidden; transition: background 0.4s;
+  }
+  .feature-card:hover { background: var(--groove); }
+  .feature-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 0; height: 2px; background: var(--ember); transition: width 0.45s ease;
+  }
+  .feature-card:hover::before { width: 100%; }
+  .feature-glyph {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 3.5rem; color: rgba(240,236,228,0.07); line-height: 1; margin-bottom: 1.8rem;
+  }
+  .feature-card h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600;
+    color: var(--white); margin-bottom: 0.9rem;
+  }
+  .feature-card p {
+    font-size: 1.05rem; font-weight: 300; line-height: 1.75; color: var(--off-white); opacity: 0.7;
+  }
+
+  /* WAITLIST */
+  .mailing { position: relative; overflow: hidden; }
+  .mailing-ring {
+    position: absolute; top: 50%; left: 50%; border-radius: 50%;
+    border: 1px solid rgba(240,236,228,0.025);
+    transform: translate(-50%, -50%); animation: breathe 5s ease-in-out infinite;
+  }
+  .mailing-ring-1 { width: 600px; height: 600px; }
+  .mailing-ring-2 { width: 950px; height: 950px; animation-delay: 1.5s; }
+  .mailing-inner { max-width: 680px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
+  .mailing h2 { margin-bottom: 1rem; }
+  .mailing p {
+    font-size: 1.2rem; font-weight: 300; color: var(--off-white); line-height: 1.75;
+    margin-bottom: 3rem; opacity: 0.8;
+  }
+  .mail-form { display: flex; max-width: 540px; margin: 0 auto 1.5rem; }
+  .mail-form input {
+    flex: 1; padding: 1.15rem 1.5rem;
+    background: rgba(240,236,228,0.04); border: 1px solid rgba(240,236,228,0.15); border-right: none;
+    color: var(--white); font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.05em; outline: none; transition: border-color 0.3s;
+  }
+  .mail-form input::placeholder { color: var(--off-white); opacity: 0.3; }
+  .mail-form input:focus { border-color: rgba(240,236,228,0.35); }
+  .mail-form button {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em;
+    text-transform: uppercase; padding: 1.15rem 2rem;
+    background: var(--white); color: var(--black); border: none; cursor: none;
+    white-space: nowrap; transition: background 0.3s;
+  }
+  .mail-form button:hover { background: var(--accent); }
+  .mail-note {
+    font-family: 'Space Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--off-white); opacity: 0.3;
+  }
+  .success-msg {
+    display: none; font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem; font-style: italic; color: var(--white);
+    padding: 1.5rem; border: 1px solid rgba(240,236,228,0.15);
+    max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.6;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 4rem; display: flex; justify-content: space-between;
+    align-items: center; border-top: 1px solid var(--dim);
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+    letter-spacing: 0.3em; color: var(--white); opacity: 0.5;
+  }
+  .footer-logo span { color: var(--ember); opacity: 1; }
+  .footer-text {
+    font-family: 'Space Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.12em; color: var(--off-white); opacity: 0.25;
+  }
+
+  /* REVEAL */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.85s ease, transform 0.85s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    nav ul { display: none; }
+    section { padding: 5rem 2rem; }
+    .what-inner, .burn-demo-inner { grid-template-columns: 1fr; gap: 4rem; }
+    .record-diagram, .record-disc { width: 280px; height: 280px; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .steps::before { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .mail-form { flex-direction: column; }
+    .mail-form input { border-right: 1px solid rgba(240,236,228,0.15); border-bottom: none; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Burn<span>Vinyl</span></a>
+  <ul>
+    <li><a href="#what">What It Is</a></li>
+    <li><a href="#how">How to Burn</a></li>
+    <li><a href="#features">The Record</a></li>
+    <li><a href="#waitlist">Early Access</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <svg class="vinyl-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="98" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="90" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="82" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="74" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="66" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="58" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="50" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="42" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="34" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="26" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="18" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="8"  fill="white" opacity="0.4"/>
+  </svg>
+  <svg class="vinyl-bg-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="98" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="82" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="66" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="50" fill="none" stroke="white" stroke-width="0.3"/>
+    <circle cx="100" cy="100" r="34" fill="none" stroke="white" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="8"  fill="white" opacity="0.3"/>
+  </svg>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Your Music. Pressed Forever.</div>
+    <h1>
+      Burn Your Songs<br>
+      <em>onto real vinyl.</em>
+      Once.
+    </h1>
+    <p class="hero-sub">
+      Choose the songs. Burn the record. It's yours — permanently pressed into the grooves, impossible to overwrite, impossible to erase. Just like music always should have been.
+    </p>
+    <div class="hero-cta">
+      <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+      <a href="#how" class="btn-ghost">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span>BURN ONCE</span><span class="dot">·</span>
+    <span>PRESS FOREVER</span><span class="dot">·</span>
+    <span>40 MINUTES PER RECORD</span><span class="dot">·</span>
+    <span>SIDE A &amp; SIDE B</span><span class="dot">·</span>
+    <span>YOUR SONGS</span><span class="dot">·</span>
+    <span>YOUR RECORD</span><span class="dot">·</span>
+    <span>PERMANENT</span><span class="dot">·</span>
+    <span>HIGH FIDELITY</span><span class="dot">·</span>
+    <span>BURN ONCE</span><span class="dot">·</span>
+    <span>PRESS FOREVER</span><span class="dot">·</span>
+    <span>40 MINUTES PER RECORD</span><span class="dot">·</span>
+    <span>SIDE A &amp; SIDE B</span><span class="dot">·</span>
+    <span>YOUR SONGS</span><span class="dot">·</span>
+    <span>YOUR RECORD</span><span class="dot">·</span>
+    <span>PERMANENT</span><span class="dot">·</span>
+    <span>HIGH FIDELITY</span><span class="dot">·</span>
+  </div>
+</div>
+
+<!-- WHAT IS IT -->
+<section id="what">
+  <div class="what-inner">
+    <div class="what-text reveal">
+      <div class="section-label">What It Is</div>
+      <h2>Your Playlist.<br>Pressed in Wax.</h2>
+      <p>
+        BurnVinyl lets you take any songs from your digital library and <strong>burn them permanently onto a real vinyl record</strong> — the same way music was pressed for decades. Except now, you choose what goes on it.
+      </p>
+      <p>
+        Each blank record holds <strong>40 minutes of music</strong>. Twenty on Side A. Twenty on Side B. Pick your tracks, fill the grooves, and press burn. Once it's done, <strong>those songs live in that record forever</strong>. You can't undo it. You can't overwrite it. That's the point.
+      </p>
+      <p>
+        The result is something streaming will never give you — <em>a permanent, physical object that holds the music you chose, on the day you chose it.</em>
+      </p>
+    </div>
+    <div class="record-visual reveal reveal-delay-2">
+      <div class="record-diagram">
+        <div class="record-disc"></div>
+        <div class="burn-dot"></div>
+        <div class="record-center">
+          <div class="record-center-brand">BURN</div>
+          <div class="record-center-brand" style="opacity:0.4;font-size:0.45rem;">VINYL</div>
+        </div>
+      </div>
+      <div class="capacity-grid">
+        <div class="cap-cell">
+          <div class="cap-num">40</div>
+          <div class="cap-label">Minutes total</div>
+        </div>
+        <div class="cap-cell">
+          <div class="cap-num">2</div>
+          <div class="cap-label">Sides per record</div>
+        </div>
+        <div class="cap-cell">
+          <div class="cap-num">20</div>
+          <div class="cap-label">Min per side</div>
+        </div>
+        <div class="cap-cell">
+          <div class="cap-num">1×</div>
+          <div class="cap-label">Burn. That's it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how">
+  <div class="how-inner">
+    <div class="how-header reveal">
+      <div class="section-label">The Process</div>
+      <h2>How to Burn<br>a Record</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-dot"></div>
+        <h3>Pick Your Songs</h3>
+        <p>Open the BurnVinyl app and choose tracks from your music library. Fill Side A, then Side B. You have 20 minutes per side — so every song is a decision.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-dot"></div>
+        <h3>Review the Press</h3>
+        <p>Preview the track order, timing, and side splits. Rearrange until it feels right. Once you're satisfied — and only once — you commit to the burn.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-dot"></div>
+        <h3>Burn It</h3>
+        <p>Tap Burn. Your music is cut into the grooves of the record. When it's done, those songs are sealed in — permanently, irrevocably yours.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-dot"></div>
+        <h3>Drop the Needle</h3>
+        <p>Place it on any turntable and play. Your music. Your sequence. Pressed into vinyl. No subscription. No algorithm. No expiry date.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERMANENCE -->
+<section class="permanence">
+  <div class="reveal">
+    <div class="section-label">Why Permanent</div>
+    <p class="permanence-quote">
+      "A playlist is a suggestion. A record is a <strong>statement</strong>. When you can't change it, you finally have to mean it."
+    </p>
+    <div class="permanence-sub">— The BurnVinyl Manifesto</div>
+  </div>
+</section>
+
+<!-- TRACKLIST DEMO -->
+<section class="burn-demo" id="features">
+  <div class="burn-demo-inner">
+    <div class="reveal">
+      <div class="section-label">The Record</div>
+      <h2>Every Song<br>Is a Commitment</h2>
+      <p>
+        Because you only get one burn, <strong>choosing your tracks means something</strong>. This isn't curation you'll undo tomorrow. It's a record — with everything that word implies.
+      </p>
+      <p>
+        Pick the song that defined a summer. The track you played the night everything changed. The album closer nobody skips. Fill the grooves with music that deserves to last.
+      </p>
+      <p>
+        <strong>Blank records are available in packs.</strong> Each one is a fresh 40 minutes waiting to become something permanent.
+      </p>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="tracklist">
+        <div class="tracklist-header">
+          <div class="tracklist-title">My Record #001</div>
+          <div class="tracklist-cap">Burning…</div>
+        </div>
+        <div class="side-divider">
+          <div class="side-divider-label">Side A</div>
+          <div class="side-remaining">3:12 remaining</div>
+        </div>
+        <div class="track-row burned">
+          <div class="track-idx">1</div>
+          <div class="track-name">Gold in the Fog</div>
+          <div class="track-dur">4:22</div>
+        </div>
+        <div class="track-row burned">
+          <div class="track-idx">2</div>
+          <div class="track-name">November Light</div>
+          <div class="track-dur">3:58</div>
+        </div>
+        <div class="track-row burned">
+          <div class="track-idx">3</div>
+          <div class="track-name">Salt &amp; Kerosene</div>
+          <div class="track-dur">5:11</div>
+        </div>
+        <div class="track-row burning">
+          <div class="track-idx">●</div>
+          <div class="track-name">The Long Way Home</div>
+          <div class="track-dur">3:17</div>
+        </div>
+        <div class="side-divider" style="margin-top:4px">
+          <div class="side-divider-label">Side B</div>
+          <div class="side-remaining">20:00 remaining</div>
+        </div>
+        <div class="track-row" style="opacity:0.35">
+          <div class="track-idx">5</div>
+          <div class="track-name">Empty Canyon</div>
+          <div class="track-dur">4:44</div>
+        </div>
+        <div class="track-row" style="opacity:0.35">
+          <div class="track-idx">6</div>
+          <div class="track-name">Burning Hour</div>
+          <div class="track-dur">5:03</div>
+        </div>
+        <div class="track-row" style="opacity:0.2">
+          <div class="track-idx">+</div>
+          <div class="track-name" style="font-style:italic;font-family:'Cormorant Garamond',serif;font-size:0.9rem;opacity:0.5">Side B not yet burned</div>
+          <div class="track-dur"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="features-inner">
+    <div class="features-header reveal">
+      <div class="section-label">The Details</div>
+      <h2>Built Around<br>the Ritual</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-glyph">I</div>
+        <h3>One Burn Per Record</h3>
+        <p>Every blank record has exactly one burn in it. Once your songs are in the grooves, they're permanent. There's no second chance — and that's what makes the first one count.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-glyph">II</div>
+        <h3>40 Minutes of Music</h3>
+        <p>Twenty minutes per side, just like a classic LP. Enough for a tight album, a long drive, or a mixtape built with intention. Every second is a choice you can't take back.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-glyph">III</div>
+        <h3>Any Song You Own</h3>
+        <p>Burn tracks from your personal library — songs you've bought, ripped, or own outright. The BurnVinyl app makes selecting, sequencing, and previewing your record easy before you commit.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-glyph">IV</div>
+        <h3>Plays on Any Turntable</h3>
+        <p>A BurnVinyl record is a real vinyl record. It plays on any standard turntable, at 33⅓ RPM, with the warmth and depth the format is known for. No special hardware needed to listen.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-glyph">V</div>
+        <h3>High Fidelity Sound</h3>
+        <p>The burn process preserves the full depth and warmth of your audio. No compression artifacts, no digital thinness — just your music, cut into the groove the way it deserves to be heard.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-glyph">VI</div>
+        <h3>Physical Ownership</h3>
+        <p>No subscription. No streaming rights. No one can revoke it. When the record is burned, it's an object — yours, forever, independent of any platform or service that may disappear tomorrow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section id="waitlist" class="mailing">
+  <div class="mailing-ring mailing-ring-1"></div>
+  <div class="mailing-ring mailing-ring-2"></div>
+  <div class="mailing-inner reveal">
+    <div class="section-label">Early Access</div>
+    <h2>Be First<br>to Burn</h2>
+    <p>
+      BurnVinyl is almost ready. Join the waitlist and we'll let you know the moment you can press your first record — before anyone else.
+    </p>
+    <div class="mail-form" id="mailForm">
+      <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="off">
+      <button type="button" onclick="handleSubmit()">Notify Me</button>
+    </div>
+    <div class="success-msg" id="successMsg">
+      You're on the list. Your first record is waiting to be burned.
+    </div>
+    <div class="mail-note">No spam. No noise. Just signal.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Burn<span>Vinyl</span></div>
+  <div class="footer-text">© 2026 BurnVinyl, Inc. — Press it once. Keep it forever.</div>
+  <div class="footer-text">Boston, MA</div>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, input').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+  function handleSubmit() {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email || !email.includes('@')) {
+      const input = document.getElementById('emailInput');
+      input.style.borderColor = 'rgba(192,57,43,0.7)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1600);
+      return;
+    }
+    document.getElementById('mailForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+  document.getElementById('emailInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
+</body>
+</html>
